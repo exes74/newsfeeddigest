@@ -224,7 +224,7 @@ def main():
 			print('-----------------------------------------------------------------------------------')
 			print('Traitement de l\'article: '+article['title'])
 			content = convert_html_to_text(article['html_content'])
-			#print('Contenu: '+content)
+			print('Contenu: '+content)
 			summary = summarize_gpt(content)
 
 			try:
@@ -233,9 +233,9 @@ def main():
 				title_without_tag = data.get("title", "")
 				content_without_title = data.get("summary", "")
 			except json.JSONDecodeError as e:
-				tag = ""
-				title_without_tag = ""
-				content_without_title = ""
+				tag = "ERROR"
+				title_without_tag = "ERROR"
+				content_without_title = "ERROR"
 
 			article_data = {
 				'source': article['site_name'],
