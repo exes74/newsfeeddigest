@@ -67,6 +67,9 @@ def load_api_keys(config_path):
 
 
 def push_to_notion(site_name, published_date, tag, title_without_tag, content_without_title, url):
+	database_info = notion.databases.retrieve(database_id=NOTION_DATABASE_ID)
+	print(database_info)
+	
 	"""
 	Enregistre un article dans la base Notion spécifiée par NOTION_DATABASE_ID.
 	"""  
