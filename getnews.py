@@ -1,4 +1,4 @@
-#!/home/debian/venv/bin/python
+#!/opt/readwise/venv/bin/python
 
 import requests
 import datetime
@@ -20,13 +20,35 @@ import json
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-READWISE_API_TOKEN = 'XXXXXXXX'
+CONFIG_PATH = "/etc/scrt/api_key"
+# Charger les clés
+api_keys = load_api_keys(CONFIG_PATH)
+# Vérifier et assigner les variables si le fichier a été bien chargé
+if api_keys:
+    READWISE_API_TOKEN = api_keys.get("READWISE_API_TOKEN")
+    NOTION_DATABASE_ID = api_keys.get("NOTION_DATABASE_ID")	
+    OPENAI_API_KEY = api_keys.get("OPENAI_API_KEY")
+    NOTION_TOKEN = api_keys.get("NOTION_TOKEN")
+    
+    # Affichage de test (retirer en prod)
+    print("Clés chargées avec succès !")
+	
 BASE_URL = 'https://readwise.io/api/v2'
-OPENAI_API_KEY = 'XXXXXX'
-NOTION_TOKEN = 'XXXXXXX'
-NOTION_DATABASE_ID = 'XXXXXXXX'
-
 notion = Client(auth=NOTION_TOKEN)
+
+
+def load_api_keys(config_path):
+    try:
+        with open(config_path, "r") as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        print(f"Erreur : Le fichier {config_path} n'existe pas.")
+        return None
+    except json.JSONDecodeError:
+        print("Erreur : Le fichier JSON est mal formaté.")
+        return None
+
 
 
 def push_to_notion(site_name, published_date, tag, title_without_tag, content_without_title, url):
