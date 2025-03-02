@@ -164,7 +164,7 @@ def summarize_gpt(article_content):
 		thread = client.beta.threads.create()
 
         # Envoi de l'article à l'Assistant
-	        message = client.beta.threads.messages.create(
+		message = client.beta.threads.messages.create(
 			thread_id=thread.id,
 			role="user",
 			content=article_content
