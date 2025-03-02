@@ -37,10 +37,13 @@ def load_api_keys(config_path):
 api_keys = load_api_keys(CONFIG_PATH)
 # Vérifier et assigner les variables si le fichier a été bien chargé
 if api_keys:
-    READWISE_API_TOKEN = api_keys.get("READWISE_API_TOKEN")
-    NOTION_DATABASE_ID = api_keys.get("NOTION_DATABASE_ID")	
-    OPENAI_API_KEY = api_keys.get("OPENAI_API_KEY")
-    NOTION_TOKEN = api_keys.get("NOTION_TOKEN")
+	READWISE_API_TOKEN = api_keys.get("READWISE_API_TOKEN")
+	NOTION_DATABASE_ID = api_keys.get("NOTION_DATABASE_ID")	
+	OPENAI_API_KEY = api_keys.get("OPENAI_API_KEY")
+	NOTION_TOKEN = api_keys.get("NOTION_TOKEN")
+	SENDER_MAIL = api_keys.get("SENDER_MAIL")
+	PWD_MAIL = api_keys.get("PWD_MAIL")
+
     
     # Affichage de test (retirer en prod)
     print("Clés chargées avec succès !")
@@ -191,8 +194,8 @@ def summarize_gpt(article_content):
 
 
 def send_html_email(to_email, subject, html_body):
-	from_email = "XXXXXX@gmail.com"
-	password = "XXXXXXX"  #
+	from_email = SENDER_MAIL
+	password = PWD_MAIL  #
 
 	msg = MIMEMultipart("alternative")
 	msg["Subject"] = subject
@@ -213,7 +216,7 @@ def send_html_email(to_email, subject, html_body):
 
 def main():
 	yesterday_str = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
-	docs_after_date = datetime.datetime.now() - datetime.timedelta(hours=25)	
+	docs_after_date = datetime.datetime.now() - datetime.timedelta(hours=48)	
 	articles = fetch_reader_document_list_api(docs_after_date.isoformat())	
 	if articles:
 
@@ -233,7 +236,7 @@ def main():
 			except json.JSONDecodeError as e:
 				tag = ""
 				title_without_tag = ""
-				content_without_title = summarized_json_str  # ou ""
+				content_without_title = ""
 
 			article_data = {
 				'source': article['site_name'],
