@@ -53,6 +53,9 @@ notion = Client(auth=NOTION_TOKEN)
 ASSISTANT_ID = "asst_8XTJeyIuPctQM5AKm8VrBGb8"
 
 def load_api_keys(config_path):
+    """
+    Load API keys from a JSON configuration file.
+    """
     try:
         with open(config_path, "r") as file:
             data = json.load(file)
@@ -67,6 +70,9 @@ def load_api_keys(config_path):
 
 
 def push_to_notion(site_name, published_date, tag, title_without_tag, content_without_title, url):
+	    """
+    Stores an article in the specified Notion database.
+    """
 	database_info = notion.databases.retrieve(database_id=NOTION_DATABASE_ID)
 	print(database_info)
 	
@@ -131,12 +137,18 @@ def push_to_notion(site_name, published_date, tag, title_without_tag, content_wi
 
 
 def convert_html_to_text(html_content):
+	    """
+    Converts HTML content into plain text by removing tags.
+    """
 	soup = BeautifulSoup(html_content, 'html.parser')
 	text = soup.get_text()
 	cleaned_text = ' '.join(text.split())
 	return cleaned_text
 
 def fetch_reader_document_list_api(updated_after=None):
+	    """
+    Fetch articles from Readwise API with optional filtering by date.
+    """
 	full_data = []
 	next_page_cursor = None
 	while True:
@@ -161,6 +173,9 @@ def fetch_reader_document_list_api(updated_after=None):
 	return full_data[:20]
 
 def summarize_gpt(article_content):
+	    """
+    Summarizes an article using OpenAI's GPT model.
+    """
 	try:
 		client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
@@ -195,6 +210,9 @@ def summarize_gpt(article_content):
         	return None
 
 def send_html_email(to_email, subject, html_body):
+	    """
+    Sends an HTML email with the specified subject and body.
+    """
 	from_email = SENDER_MAIL
 	password = PWD_MAIL  #
 
@@ -216,6 +234,9 @@ def send_html_email(to_email, subject, html_body):
 
 
 def main():
+	    """
+    Main function to fetch, process, summarize, store, and email articles.
+    """
 	yesterday_str = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 	docs_after_date = datetime.datetime.now() - datetime.timedelta(hours=48)	
 	articles = fetch_reader_document_list_api(docs_after_date.isoformat())	
