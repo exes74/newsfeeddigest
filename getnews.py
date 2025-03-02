@@ -42,6 +42,7 @@ if api_keys:
 	OPENAI_API_KEY = api_keys.get("OPENAI_API_KEY")
 	NOTION_TOKEN = api_keys.get("NOTION_TOKEN")
 	SENDER_MAIL = api_keys.get("SENDER_MAIL")
+	RECIPIENT_MAIL = api_keys.get("RECIPIENT_MAIL")
 	PWD_MAIL = api_keys.get("PWD_MAIL")
 	# Affichage de test (retirer en prod)
 	print("Clés chargées avec succès !")
@@ -278,7 +279,7 @@ def main():
 		email_body_str = "\n".join(email_body)
 		subject = f"Récapitulatif des articles du {docs_after_date.strftime('%Y-%m-%d')}"
 		send_html_email(
-			to_email="y@ymbca.com",
+			to_email=RECIPIENT_MAIL,
 			subject=subject,
 			html_body=email_body_str
 		)
@@ -286,7 +287,7 @@ def main():
 		email_body_str = "Aucun article trouvé pour les dernières 24h."
 		subject = f"Récapitulatif des articles du {docs_after_date.strftime('%Y-%m-%d')}"
 		send_html_email(
-			to_email="y@ymbca.com",
+			to_email=RECIPIENT_MAIL,
 			subject=subject,
 			html_body=email_body_str
 		)
