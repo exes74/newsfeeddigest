@@ -7,6 +7,7 @@ from getpass import getpass
 import pprint
 from bs4 import BeautifulSoup
 from openai import OpenAI
+import openai
 import re
 import datetime
 import smtplib
