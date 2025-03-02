@@ -136,6 +136,13 @@ def generate_email_content(articles):
     
     return "".join(email_body)
 
+def get_last_month_name_and_year():
+	today = datetime.date.today()
+	first_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
+	month_name = calendar.month_name[first_day_last_month.month]
+	year = first_day_last_month.year
+	return month_name, year
+
 def send_html_email(to_email, subject, html_body):
 	from_email = SENDER_MAIL
 	password = PWD_MAIL  #
@@ -158,12 +165,15 @@ def send_html_email(to_email, subject, html_body):
 
 def main():
 	articles = query_notion_database()
+	
 	if not articles:
 		print("Aucun article trouvé pour le mois dernier.")
 		email_content="Pas d'articles en base pour le mois dernier."
 	else:
 		email_content = generate_email_content(articles)
 	#print(email_content)  # À envoyer via un service d'email
+	month_name, year = get_last_month_name_and_year()
+	subject = f"Récapitulatif des articles CyberSecurite du mois de {month_name} {year}"
 	send_html_email(
 		to_email=RECIPIENT_MAIL,
 		subject=subject,
