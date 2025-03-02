@@ -149,7 +149,7 @@ def send_html_email(to_email, object, html_body):
 	password = PWD_MAIL  #
 
 	msg = MIMEMultipart("alternative")
-	msg["Subject"] = subject
+	msg["Subject"] = object
 	msg["From"] = from_email
 	msg["To"] = to_email
 
