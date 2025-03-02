@@ -224,8 +224,8 @@ def main():
 				continue
 			print('-----------------------------------------------------------------------------------')
 			print('Traitement de l\'article: '+article['title'])
-			print('Contenu: '+article['html_content'])
 			content = convert_html_to_text(article['html_content'])
+			print('Contenu: '+content)
 			summary = summarize_gpt(content)
 
 			try:
