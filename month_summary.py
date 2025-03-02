@@ -136,14 +136,39 @@ def generate_email_content(articles):
     
     return "".join(email_body)
 
+def send_html_email(to_email, subject, html_body):
+	from_email = SENDER_MAIL
+	password = PWD_MAIL  #
+
+	msg = MIMEMultipart("alternative")
+	msg["Subject"] = subject
+	msg["From"] = from_email
+	msg["To"] = to_email
+
+	text_body = "Votre client mail ne supporte pas l'affichage HTML."
+	part_text = MIMEText(text_body, "plain", "utf-8")
+	msg.attach(part_text)
+	part_html = MIMEText(html_body, "html", "utf-8")
+	msg.attach(part_html)
+	context = ssl.create_default_context()
+	with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+		server.login(from_email, password)
+		server.sendmail(from_email, to_email, msg.as_string())
+	# print("E-mail HTML envoyé avec succès !")
+
 def main():
-    articles = query_notion_database()
-    if not articles:
-        print("Aucun article trouvé pour le mois dernier.")
-        return
-    
-    email_content = generate_email_content(articles)
-    print(email_content)  # À envoyer via un service d'email
+	articles = query_notion_database()
+	if not articles:
+		print("Aucun article trouvé pour le mois dernier.")
+		email_content="Pas d'articles en base pour le mois dernier."
+	else:
+		email_content = generate_email_content(articles)
+	#print(email_content)  # À envoyer via un service d'email
+	send_html_email(
+		to_email=RECIPIENT_MAIL,
+		subject=subject,
+		html_body=email_content
+	)
 
 if __name__ == "__main__":
     main()
