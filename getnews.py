@@ -157,18 +157,44 @@ def fetch_reader_document_list_api(updated_after=None):
 	return full_data[:20]
 
 def summarize_gpt(article_content):
+	#prompt = f'''
+	#Tu es ChatGPT. Rédige UNIQUEMENT du JSON valide, sans texte additionnel.
+	#En te basant sur le texte suivant: {article_content}.
+	#Renvoie un JSON avec la structure suivante :
+	#{{ "tag": "...",
+	#  "title": "...",
+	 # "summary": "..."
+	#}}
+	#- "tag" doit être l'un des suivants : "Informatique", "Cybersecurite", "Finance", "Potager", "Societe" que tu choisis selon ce qui te semble le plus pertinent.
+	#- "title" doit faire maximum 15 mots.
+	#- "summary" doit faire environ 120 à 150 mots, sans commencer par "L'article".		 
+	#'''
+	
 	prompt = f'''
-	Tu es ChatGPT. Rédige UNIQUEMENT du JSON valide, sans texte additionnel.
-	En te basant sur le texte suivant: {article_content}.
-	Renvoie un JSON avec la structure suivante :
-	{{ "tag": "...",
-	  "title": "...",
-	  "summary": "..."
-	}}
-	- "tag" doit être l'un des suivants : "Informatique", "Cybersecurite", "Finance", "Potager", "Societe" que tu choisis selon ce qui te semble le plus pertinent.
-	- "title" doit faire maximum 15 mots.
-	- "summary" doit faire environ 120 à 150 mots, sans commencer par "L'article".		 
-	'''
+ 	Tu es un assistant spécialisé dans la synthèse d'articles issus d'un flux RSS. Ta mission est de générer un résumé concis et structuré de l'article fourni, tout en respectant les consignes suivantes :
+	1. **Résumé** :
+	   - Le résumé doit contenir environ **150 mots**.
+	   - Il ne doit **pas mentionner l'auteur** ni débuter par une phrase du type "L'article parle de...".
+	   - La formulation doit être fluide et informative, en allant **directement au sujet**.	
+	2. **Catégorisation** :
+	   - Identifie la thématique dominante de l'article et associe-lui **un tag** parmi la liste suivante :
+	     - "Informatique"
+	     - "Cybersecurite"
+	     - "Finance"
+	     - "Potager"
+	     - "Societe"	
+	3. **Titre** :
+	   - Génére un titre accrocheur de **15 mots maximum**, synthétisant l'idée principale de l'article.	
+	4. **Format de sortie** :
+	   - Retourne uniquement un JSON **strictement valide**, sans aucun texte supplémentaire.
+	   - La structure doit être la suivante :	   
+	  {{ "tag": "<Titre de l'article en 15 mots max>",
+	  "title": "<Résumé de l'article en environ 150 mots>",
+	  "summary":"<Un des tags les plus pertinents>"
+		}}
+  	'''
+
+	
 	try:
 		client = OpenAI(
 			api_key=OPENAI_API_KEY
