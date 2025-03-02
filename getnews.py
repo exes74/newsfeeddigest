@@ -173,9 +173,8 @@ def summarize_gpt(article_content):
 	prompt = f'''
  	Tu es un assistant spécialisé dans la synthèse d'articles issus d'un flux RSS. Ta mission est de générer un résumé concis et structuré de l'article fourni, tout en respectant les consignes suivantes :
 	1. **Résumé** :
-	   - Le résumé doit contenir environ **150 mots**.
-	   - Il ne doit **pas mentionner l'auteur** ni débuter par une phrase du type "L'article parle de...".
-	   - La formulation doit être fluide et informative, en allant **directement au sujet**.	
+	   - Résume  l'article fourni en te concentrant sur les 20% des informations les plus importantes qui transmettent 80% des idées clés. Exclue les détails non essentiels et les exemples spécifiques, en gardant seulement les points principaux, les conclusions générales et les idées centrales. Utilise des phrases concises et un vocabulaire simple. Le résumé ne doit pas dépasser 150 mots et doit refléter fidèlement les éléments centraux sans interpréter ni éditorialiser. Mets l’accent sur la hiérarchie des idées et les relations de cause à effet, en supprimant les informations superflues ou redondantes.
+	   - Il ne doit **pas mentionner l'auteur ou la source** ni débuter par une phrase du type "L'article parle de...".
 	2. **Catégorisation** :
 	   - Identifie la thématique dominante de l'article et associe-lui **un tag** parmi la liste suivante :
 	     - "Informatique"
@@ -190,8 +189,8 @@ def summarize_gpt(article_content):
 	   - La structure doit être la suivante :	   
 	  {{ "tag": "<Titre de l'article en 15 mots max>",
 	  "title": "<Résumé de l'article en environ 150 mots>",
-	  "summary":"<Un des tags les plus pertinents>"
-		}}
+	  "summary":"<le tag les plus pertinents>"
+	}}
   	Voici l'article : {article_content}.
   	'''
 
