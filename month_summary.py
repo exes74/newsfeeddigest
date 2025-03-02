@@ -176,7 +176,7 @@ def main():
 	subject = f"Récapitulatif des articles CyberSecurite du mois de {month_name} {year}"
 	send_html_email(
 		to_email=RECIPIENT_MAIL,
-		subject=subject,
+		object=subject,
 		html_body=email_content
 	)
 
