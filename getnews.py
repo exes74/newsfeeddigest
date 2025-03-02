@@ -49,7 +49,7 @@ if api_keys:
 
 BASE_URL = 'https://readwise.io/api/v2'
 notion = Client(auth=NOTION_TOKEN)
-
+ASSISTANT_ID = "asst_8XTJeyIuPctQM5AKm8VrBGb8"
 
 def load_api_keys(config_path):
     try:
@@ -157,68 +157,38 @@ def fetch_reader_document_list_api(updated_after=None):
 	return full_data[:20]
 
 def summarize_gpt(article_content):
-	#prompt = f'''
-	#Tu es ChatGPT. Rédige UNIQUEMENT du JSON valide, sans texte additionnel.
-	#En te basant sur le texte suivant: {article_content}.
-	#Renvoie un JSON avec la structure suivante :
-	#{{ "tag": "...",
-	#  "title": "...",
-	 # "summary": "..."
-	#}}
-	#- "tag" doit être l'un des suivants : "Informatique", "Cybersecurite", "Finance", "Potager", "Societe" que tu choisis selon ce qui te semble le plus pertinent.
-	#- "title" doit faire maximum 15 mots.
-	#- "summary" doit faire environ 120 à 150 mots, sans commencer par "L'article".		 
-	#'''
-	
-	prompt = f'''
- 	Tu es un assistant spécialisé dans la synthèse d'articles issus d'un flux RSS. Ta mission est de générer un résumé concis et structuré de l'article fourni, tout en respectant strictement les consignes suivantes :
-        Retourne uniquement un JSON **strictement valide**, sans aucun texte supplémentaire.
-	La structure doit être la suivante :	   
-		{{ "tag": "...",
-		  "title": "...",
-		 "summary": "..."
-		}}	
- 	1. **summary** :
-	   - Résume l'article fourni en te concentrant sur les 20% des informations les plus importantes qui transmettent 80% des idées clés. Exclue les détails non essentiels et les exemples spécifiques, en gardant seulement les points principaux, les conclusions générales et les idées centrales. Utilise des phrases concises et un vocabulaire simple. Le résumé ne doit pas dépasser 150 mots et doit refléter fidèlement les éléments centraux sans interpréter ni éditorialiser. Mets l’accent sur la hiérarchie des idées et les relations de cause à effet, en supprimant les informations superflues ou redondantes.
-	   - Le résumé ne doit pas mentionner l'auteur ou la source (ne pas réusmer les sections 'à propos de' ou équivalent) 
-           - Le résumé ne doit pas débuter par une phrase du type "L'article parle de...".
-	   - Le résumé ne doit pas inviter à s'interesser à l'auteur de l'article ou s'abonner à des newsletter ou suivre un site internet spécifique
-	2. **tag** :
-	   - Identifie la thématique dominante de l'article et associe-lui **un tag** parmi la liste suivante :
-	     - "Informatique"
-	     - "Cybersecurite"
-	     - "Finance"
-	     - "Potager"
-	     - "Societe"	
-	3. **title** :
-	   - Génére un titre accrocheur de **15 mots maximum**, synthétisant l'idée principale de l'article.	
-
-  	Voici l'article : {article_content}.
-  	'''
-
-	
 	try:
-		client = OpenAI(
-			api_key=OPENAI_API_KEY
-		)
+		client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
-		chat_completion = client.chat.completions.create(
-			messages=[
-				{
-					"role": "user",
-					"content": prompt,
-				}
-			],
-			model="gpt-3.5-turbo",
-			temperature=0.25,
-		)
-		content = chat_completion.choices[0].message.content
-		# print(content)
-		return content
+        # Création d'un thread pour interagir avec l'assistant
+		thread = client.beta.threads.create()
+
+        # Envoi de l'article à l'Assistant
+	        message = client.beta.threads.messages.create(
+			thread_id=thread.id,
+			role="user",
+			content=article_content
+        	)
+
+        # Lancer l'Assistant sur le thread
+		run = client.beta.threads.runs.create(
+            		thread_id=thread.id,
+            		assistant_id=ASSISTANT_ID
+        	)
+
+        # Attendre que l'Assistant ait fini de traiter la requête
+		while run.status not in ["completed", "failed"]:
+		run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+
+        # Récupérer la réponse finale de l'Assistant
+		messages = client.beta.threads.messages.list(thread_id=thread.id)
+		response_content = messages.data[0].content[0].text.value  # Récupération du texte de la réponse
+
+		return response_content
+
 	except Exception as e:
-		print(f"Erreur lors de l'appel à l'API : {e}")
-		return None
-
+        	print(f"Erreur lors de l'appel à l'API : {e}")
+        	return None
 
 def send_html_email(to_email, subject, html_body):
 	from_email = SENDER_MAIL
