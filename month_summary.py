@@ -48,7 +48,7 @@ if api_keys:
 	print("Clés chargées avec succès !")
 
 BASE_URL = 'https://readwise.io/api/v2'
-notion = Client(auth=NOTION_TOKEN)
+#notion = Client(auth=NOTION_TOKEN)
 
 # Headers pour l'API Notion
 headers = {
