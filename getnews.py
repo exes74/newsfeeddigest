@@ -192,6 +192,7 @@ def summarize_gpt(article_content):
 	  "title": "<Résumé de l'article en environ 150 mots>",
 	  "summary":"<Un des tags les plus pertinents>"
 		}}
+  	Voici l'article : {article_content}.
   	'''
 
 	
