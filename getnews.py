@@ -179,8 +179,8 @@ def summarize_gpt(article_content):
 		 "summary": "..."
 		}}	
  	1. **summary** :
-	   - Résume  l'article fourni en te concentrant sur les 20% des informations les plus importantes qui transmettent 80% des idées clés. Exclue les détails non essentiels et les exemples spécifiques, en gardant seulement les points principaux, les conclusions générales et les idées centrales. Utilise des phrases concises et un vocabulaire simple. Le résumé ne doit pas dépasser 150 mots et doit refléter fidèlement les éléments centraux sans interpréter ni éditorialiser. Mets l’accent sur la hiérarchie des idées et les relations de cause à effet, en supprimant les informations superflues ou redondantes.
-	   - Il ne doit **pas mentionner l'auteur ou la source** ni débuter par une phrase du type "L'article parle de...".
+	   - Résume l'article fourni en te concentrant sur les 20% des informations les plus importantes qui transmettent 80% des idées clés. Exclue les détails non essentiels et les exemples spécifiques, en gardant seulement les points principaux, les conclusions générales et les idées centrales. Utilise des phrases concises et un vocabulaire simple. Le résumé ne doit pas dépasser 150 mots et doit refléter fidèlement les éléments centraux sans interpréter ni éditorialiser. Mets l’accent sur la hiérarchie des idées et les relations de cause à effet, en supprimant les informations superflues ou redondantes.
+	   - Le résumé ne doit pas mentionner l'auteur ou la source (ne pas réusmer les sections 'à propos de' ou équivalent) ni débuter par une phrase du type "L'article parle de...".
 	2. **tag** :
 	   - Identifie la thématique dominante de l'article et associe-lui **un tag** parmi la liste suivante :
 	     - "Informatique"
