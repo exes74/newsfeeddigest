@@ -178,7 +178,7 @@ def summarize_gpt(article_content):
 
         # Attendre que l'Assistant ait fini de traiter la requête
 		while run.status not in ["completed", "failed"]:
-		run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+			run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
 
         # Récupérer la réponse finale de l'Assistant
 		messages = client.beta.threads.messages.list(thread_id=thread.id)
