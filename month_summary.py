@@ -144,7 +144,7 @@ def get_last_month_name_and_year():
 	year = first_day_last_month.year
 	return month_name, year
 
-def send_html_email(to_email, subject, html_body):
+def send_html_email(to_email, object, html_body):
 	from_email = SENDER_MAIL
 	password = PWD_MAIL  #
 
