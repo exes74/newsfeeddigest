@@ -26,6 +26,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 CONFIG_PATH = "/etc/scrt/api_key"
 
 def load_api_keys(config_path):
+	    """
+    Load API keys from a JSON configuration file.
+    """
     try:
         with open(config_path, "r") as file:
             data = json.load(file)
@@ -36,22 +39,21 @@ def load_api_keys(config_path):
     except json.JSONDecodeError:
         print("Erreur : Le fichier JSON est mal formaté.")
         return None
-# Charger les clés
+# Load API keys
 api_keys = load_api_keys(CONFIG_PATH)
-# Vérifier et assigner les variables si le fichier a été bien chargé
+# Check and assign the variables if the file was loaded successfully
 if api_keys:
 	DATABASE_ID = api_keys.get("NOTION_DATABASE_ID")	
 	NOTION_API_KEY = api_keys.get("NOTION_TOKEN")
 	SENDER_MAIL = api_keys.get("SENDER_MAIL")
 	RECIPIENT_MAIL = api_keys.get("RECIPIENT_MAIL")
 	PWD_MAIL = api_keys.get("PWD_MAIL")
-	# Affichage de test (retirer en prod)
 	print("Clés chargées avec succès !")
 
 BASE_URL = 'https://readwise.io/api/v2'
-#notion = Client(auth=NOTION_TOKEN)
 
-# Headers pour l'API Notion
+
+# Headers for Notion API
 headers = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
     "Content-Type": "application/json",
@@ -59,6 +61,9 @@ headers = {
 }
 
 def get_last_month_date_range():
+	    """
+    Returns the first and last date of the previous month.
+    """
     today = datetime.date.today()
     first_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
     first_day_last_month = first_day_last_month.replace(day=1)
@@ -67,6 +72,10 @@ def get_last_month_date_range():
     return first_day_last_month.isoformat(), last_day_last_month.isoformat()
 
 def query_notion_database():
+	    """
+    Queries Notion database for articles published last month
+    with a "HoF" checkbox checked and specific tags.
+    """
     start_date, end_date = get_last_month_date_range()
     query = {
         "filter": {
@@ -119,6 +128,9 @@ def query_notion_database():
         return []
 
 def generate_email_content(articles):
+	    """
+    Generates the email body content from the retrieved Notion articles.
+    """
     email_body = []
     for article in articles:
         title = article.get("properties", {}).get("Title", {}).get("title", [{}])[0].get("text", {}).get("content", "Sans titre")
@@ -138,6 +150,9 @@ def generate_email_content(articles):
     return "".join(email_body)
 
 def get_last_month_name_and_year():
+	    """
+    Retrieves the name and year of the last month.
+    """
 	today = datetime.date.today()
 	first_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
 	month_name = calendar.month_name[first_day_last_month.month]
@@ -145,8 +160,11 @@ def get_last_month_name_and_year():
 	return month_name, year
 
 def send_html_email(to_email, object, html_body):
+	    """
+    Sends an HTML formatted email with the specified content.
+    """
 	from_email = SENDER_MAIL
-	password = PWD_MAIL  #
+	password = PWD_MAIL 
 
 	msg = MIMEMultipart("alternative")
 	msg["Subject"] = object
@@ -162,9 +180,12 @@ def send_html_email(to_email, object, html_body):
 	with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
 		server.login(from_email, password)
 		server.sendmail(from_email, to_email, msg.as_string())
-	# print("E-mail HTML envoyé avec succès !")
 
 def main():
+	    """
+    Main function to query Notion, format the email content,
+    and send a summary of articles from last month.
+    """
 	articles = query_notion_database()
 	
 	if not articles:
