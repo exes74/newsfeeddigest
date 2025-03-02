@@ -171,7 +171,7 @@ def summarize_gpt(article_content):
 	#'''
 	
 	prompt = f'''
- 	Tu es un assistant spécialisé dans la synthèse d'articles issus d'un flux RSS. Ta mission est de générer un résumé concis et structuré de l'article fourni, tout en respectant les consignes suivantes :
+ 	Tu es un assistant spécialisé dans la synthèse d'articles issus d'un flux RSS. Ta mission est de générer un résumé concis et structuré de l'article fourni, tout en respectant strictement les consignes suivantes :
         Retourne uniquement un JSON **strictement valide**, sans aucun texte supplémentaire.
 	La structure doit être la suivante :	   
 		{{ "tag": "...",
@@ -180,7 +180,9 @@ def summarize_gpt(article_content):
 		}}	
  	1. **summary** :
 	   - Résume l'article fourni en te concentrant sur les 20% des informations les plus importantes qui transmettent 80% des idées clés. Exclue les détails non essentiels et les exemples spécifiques, en gardant seulement les points principaux, les conclusions générales et les idées centrales. Utilise des phrases concises et un vocabulaire simple. Le résumé ne doit pas dépasser 150 mots et doit refléter fidèlement les éléments centraux sans interpréter ni éditorialiser. Mets l’accent sur la hiérarchie des idées et les relations de cause à effet, en supprimant les informations superflues ou redondantes.
-	   - Le résumé ne doit pas mentionner l'auteur ou la source (ne pas réusmer les sections 'à propos de' ou équivalent) ni débuter par une phrase du type "L'article parle de...".
+	   - Le résumé ne doit pas mentionner l'auteur ou la source (ne pas réusmer les sections 'à propos de' ou équivalent) 
+           - Le résumé ne doit pas débuter par une phrase du type "L'article parle de...".
+	   - Le résumé ne doit pas inviter à s'interesser à l'auteur de l'article ou s'abonner à des newsletter ou suivre un site internet spécifique
 	2. **tag** :
 	   - Identifie la thématique dominante de l'article et associe-lui **un tag** parmi la liste suivante :
 	     - "Informatique"
@@ -208,7 +210,7 @@ def summarize_gpt(article_content):
 				}
 			],
 			model="gpt-3.5-turbo",
-			temperature=0.3,
+			temperature=0.25,
 		)
 		content = chat_completion.choices[0].message.content
 		# print(content)
