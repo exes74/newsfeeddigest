@@ -43,11 +43,9 @@ if api_keys:
 	NOTION_TOKEN = api_keys.get("NOTION_TOKEN")
 	SENDER_MAIL = api_keys.get("SENDER_MAIL")
 	PWD_MAIL = api_keys.get("PWD_MAIL")
+	# Affichage de test (retirer en prod)
+	print("Clés chargées avec succès !")
 
-    
-    # Affichage de test (retirer en prod)
-    print("Clés chargées avec succès !")
-	
 BASE_URL = 'https://readwise.io/api/v2'
 notion = Client(auth=NOTION_TOKEN)
 
