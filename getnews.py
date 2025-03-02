@@ -221,7 +221,9 @@ def main():
 		for article in articles:
 			if article['published_date'] != yesterday_str:
 				continue
+			print('-----------------------------------------------------------------------------------')
 			print('Traitement de l\'article: '+article['title'])
+			print('Contenu: '+article['html_content'])
 			content = convert_html_to_text(article['html_content'])
 			summary = summarize_gpt(content)
 
