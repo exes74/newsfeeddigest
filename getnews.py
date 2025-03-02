@@ -217,12 +217,11 @@ def main():
 	docs_after_date = datetime.datetime.now() - datetime.timedelta(hours=48)	
 	articles = fetch_reader_document_list_api(docs_after_date.isoformat())	
 	if articles:
-
 		articles_by_tag = {}
 		for article in articles:
 			if article['published_date'] != yesterday_str:
 				continue
-
+			print('Traitement de l\'article: '+article['title'])
 			content = convert_html_to_text(article['html_content'])
 			summary = summarize_gpt(content)
 
