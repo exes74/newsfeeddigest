@@ -21,6 +21,18 @@ import json
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 CONFIG_PATH = "/etc/scrt/api_key"
+
+def load_api_keys(config_path):
+    try:
+        with open(config_path, "r") as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        print(f"Erreur : Le fichier {config_path} n'existe pas.")
+        return None
+    except json.JSONDecodeError:
+        print("Erreur : Le fichier JSON est mal formaté.")
+        return None
 # Charger les clés
 api_keys = load_api_keys(CONFIG_PATH)
 # Vérifier et assigner les variables si le fichier a été bien chargé
