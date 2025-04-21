@@ -45,6 +45,7 @@ if api_keys:
 	NOTION_TOKEN = api_keys.get("NOTION_TOKEN")
 	SENDER_MAIL = api_keys.get("SENDER_MAIL")
 	RECIPIENT_MAIL = api_keys.get("RECIPIENT_MAIL")
+	RECIPIENT_MAIL_SECU = api_keys.get("RECIPIENT_MAIL_SECU")
 	PWD_MAIL = api_keys.get("PWD_MAIL")
 	# Affichage de test (retirer en prod)
 	print("Clés chargées avec succès !")
