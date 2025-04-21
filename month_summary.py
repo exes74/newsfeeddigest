@@ -26,19 +26,19 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 CONFIG_PATH = "/etc/scrt/api_key"
 
 def load_api_keys(config_path):
-	    """
-    Load API keys from a JSON configuration file.
-    """
-    try:
-        with open(config_path, "r") as file:
-            data = json.load(file)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur : Le fichier {config_path} n'existe pas.")
-        return None
-    except json.JSONDecodeError:
-        print("Erreur : Le fichier JSON est mal formaté.")
-        return None
+	"""
+	Load API keys from a JSON configuration file.
+	"""
+	try:
+		with open(config_path, "r") as file:
+			data = json.load(file)
+		return data
+	except FileNotFoundError:
+		print(f"Erreur : Le fichier {config_path} n'existe pas.")
+		return None
+	except json.JSONDecodeError:
+		print("Erreur : Le fichier JSON est mal formaté.")
+		return None
 # Load API keys
 api_keys = load_api_keys(CONFIG_PATH)
 # Check and assign the variables if the file was loaded successfully
@@ -55,104 +55,104 @@ BASE_URL = 'https://readwise.io/api/v2'
 
 # Headers for Notion API
 headers = {
-    "Authorization": f"Bearer {NOTION_API_KEY}",
-    "Content-Type": "application/json",
-    "Notion-Version": "2022-06-28"
+	"Authorization": f"Bearer {NOTION_API_KEY}",
+	"Content-Type": "application/json",
+	"Notion-Version": "2022-06-28"
 }
 
 def get_last_month_date_range():
-	    """
-    Returns the first and last date of the previous month.
-    """
-    today = datetime.date.today()
-    first_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
-    first_day_last_month = first_day_last_month.replace(day=1)
-    last_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
-    
-    return first_day_last_month.isoformat(), last_day_last_month.isoformat()
+	"""
+	Returns the first and last date of the previous month.
+	"""
+	today = datetime.date.today()
+	first_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
+	first_day_last_month = first_day_last_month.replace(day=1)
+	last_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
+	
+	return first_day_last_month.isoformat(), last_day_last_month.isoformat()
 
 def query_notion_database():
-	    """
-    Queries Notion database for articles published last month
-    with a "HoF" checkbox checked and specific tags.
-    """
-    start_date, end_date = get_last_month_date_range()
-    query = {
-        "filter": {
-            "and": [
-                {
-                    "property": "Publication Date",
-                    "date": {
-                        "on_or_after": start_date
-                    }
-                },
-                {
-                    "property": "Publication Date",
-                    "date": {
-                        "on_or_before": end_date
-                    }
-                },
-                {
-                    "property": "HoF",
-                    "checkbox": {
-                        "equals": True
-                    }
-                },
-                {
-                    "or": [
-                        {
-                            "property": "Tag",
-                            "multi_select": {
-                                "contains": "Cybersecurite"
-                            }
-                        },
-                        {
-                            "property": "Tag",
-                            "multi_select": {
-                                "contains": "Informatique"
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    }
-    
-    url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
-    response = requests.post(url, headers=headers, json=query)
-    
-    if response.status_code == 200:
-        return response.json().get("results", [])
-    else:
-        print(f"Erreur API Notion: {response.status_code} - {response.text}")
-        return []
+	"""
+	Queries Notion database for articles published last month
+	with a "HoF" checkbox checked and specific tags.
+	"""
+	start_date, end_date = get_last_month_date_range()
+	query = {
+		"filter": {
+			"and": [
+				{
+					"property": "Publication Date",
+					"date": {
+						"on_or_after": start_date
+					}
+				},
+				{
+					"property": "Publication Date",
+					"date": {
+						"on_or_before": end_date
+					}
+				},
+				{
+					"property": "HoF",
+					"checkbox": {
+						"equals": True
+					}
+				},
+				{
+					"or": [
+						{
+							"property": "Tag",
+							"multi_select": {
+								"contains": "Cybersecurite"
+							}
+						},
+						{
+							"property": "Tag",
+							"multi_select": {
+								"contains": "Informatique"
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+	
+	url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
+	response = requests.post(url, headers=headers, json=query)
+	
+	if response.status_code == 200:
+		return response.json().get("results", [])
+	else:
+		print(f"Erreur API Notion: {response.status_code} - {response.text}")
+		return []
 
 def generate_email_content(articles):
-	    """
-    Generates the email body content from the retrieved Notion articles.
-    """
-    email_body = []
-    for article in articles:
-        title = article.get("properties", {}).get("Title", {}).get("title", [{}])[0].get("text", {}).get("content", "Sans titre")
-        date = article.get("properties", {}).get("Publication Date", {}).get("date", {}).get("start", "Inconnue")
-        url = article.get("properties", {}).get("Article URL", {}).get("url", "")
-        source = article.get("properties", {}).get("Source", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "Inconnu")
-        summary = article.get("properties", {}).get("Summary", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "Pas de résumé")
-        
-        source_link = f'<a href="{url}">{source}</a>'
-        email_body.append(f"""
-            <h4>{title}</h4>                    
-            <p>{summary}</p>
-            <p><strong> {date} / {source_link}</strong></p>
-            <hr/>
-        """)
-    
-    return "".join(email_body)
+	"""
+	Generates the email body content from the retrieved Notion articles.
+	"""
+	email_body = []
+	for article in articles:
+		title = article.get("properties", {}).get("Title", {}).get("title", [{}])[0].get("text", {}).get("content", "Sans titre")
+		date = article.get("properties", {}).get("Publication Date", {}).get("date", {}).get("start", "Inconnue")
+		url = article.get("properties", {}).get("Article URL", {}).get("url", "")
+		source = article.get("properties", {}).get("Source", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "Inconnu")
+		summary = article.get("properties", {}).get("Summary", {}).get("rich_text", [{}])[0].get("text", {}).get("content", "Pas de résumé")
+		
+		source_link = f'<a href="{url}">{source}</a>'
+		email_body.append(f"""
+			<h4>{title}</h4>					
+			<p>{summary}</p>
+			<p><strong> {date} / {source_link}</strong></p>
+			<hr/>
+		""")
+	
+	return "".join(email_body)
 
 def get_last_month_name_and_year():
-	    """
-    Retrieves the name and year of the last month.
-    """
+	"""
+	Retrieves the name and year of the last month.
+	"""
 	today = datetime.date.today()
 	first_day_last_month = today.replace(day=1) - datetime.timedelta(days=1)
 	month_name = calendar.month_name[first_day_last_month.month]
@@ -160,9 +160,9 @@ def get_last_month_name_and_year():
 	return month_name, year
 
 def send_html_email(to_email, object, html_body):
-	    """
-    Sends an HTML formatted email with the specified content.
-    """
+	"""
+	Sends an HTML formatted email with the specified content.
+	"""
 	from_email = SENDER_MAIL
 	password = PWD_MAIL 
 
@@ -182,10 +182,10 @@ def send_html_email(to_email, object, html_body):
 		server.sendmail(from_email, to_email, msg.as_string())
 
 def main():
-	    """
-    Main function to query Notion, format the email content,
-    and send a summary of articles from last month.
-    """
+	"""
+	Main function to query Notion, format the email content,
+	and send a summary of articles from last month.
+	"""
 	articles = query_notion_database()
 	
 	if not articles:
@@ -203,4 +203,4 @@ def main():
 	)
 
 if __name__ == "__main__":
-    main()
+	main()
