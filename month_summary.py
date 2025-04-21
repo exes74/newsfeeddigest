@@ -46,6 +46,7 @@ if api_keys:
 	DATABASE_ID = api_keys.get("NOTION_DATABASE_ID")	
 	NOTION_API_KEY = api_keys.get("NOTION_TOKEN")
 	SENDER_MAIL = api_keys.get("SENDER_MAIL")
+	RECIPIENT_MAIL_SECU = api_keys.get("RECIPIENT_MAIL_SECU")
 	RECIPIENT_MAIL = api_keys.get("RECIPIENT_MAIL")
 	PWD_MAIL = api_keys.get("PWD_MAIL")
 	print("Clés chargées avec succès !")
@@ -197,7 +198,7 @@ def main():
 	month_name, year = get_last_month_name_and_year()
 	subject = f"Récapitulatif des articles CyberSecurite du mois de {month_name} {year}"
 	send_html_email(
-		to_email=RECIPIENT_MAIL,
+		to_email=RECIPIENT_MAIL_SECU,
 		object=subject,
 		html_body=email_content
 	)
