@@ -18,6 +18,7 @@ from email.mime.text import MIMEText
 from notion_client import Client
 import os
 import json
+import time
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -172,42 +173,58 @@ def fetch_reader_document_list_api(updated_after=None):
 	# return full_data
 	return full_data[:20]
 
-def summarize_gpt(article_content):
+def summarize_gpt(article_content, retries=5, delay=2):
+	attempt = 0
 	    """
     Summarizes an article using OpenAI's GPT model.
     """
-	try:
-		client = openai.OpenAI(api_key=OPENAI_API_KEY)
+	while attempt < retries:
+		try:
+			client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
-        # Création d'un thread pour interagir avec l'assistant
-		thread = client.beta.threads.create()
+			# Création d'un thread pour interagir avec l'assistant
+			thread = client.beta.threads.create()
 
-        # Envoi de l'article à l'Assistant
-		message = client.beta.threads.messages.create(
-			thread_id=thread.id,
-			role="user",
-			content=article_content
-        	)
+			# Envoi de l'article à l'Assistant
+			message = client.beta.threads.messages.create(
+				thread_id=thread.id,
+				role="user",
+				content=article_content
+				)
 
-        # Lancer l'Assistant sur le thread
-		run = client.beta.threads.runs.create(
-            		thread_id=thread.id,
-            		assistant_id=ASSISTANT_ID
-        	)
+			# Lancer l'Assistant sur le thread
+			run = client.beta.threads.runs.create(
+						thread_id=thread.id,
+						assistant_id=ASSISTANT_ID
+				)
 
-        # Attendre que l'Assistant ait fini de traiter la requête
-		while run.status not in ["completed", "failed"]:
-			run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+			# Attendre que l'Assistant ait fini de traiter la requête
+			while run.status not in ["completed", "failed"]:
+				run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
 
-        # Récupérer la réponse finale de l'Assistant
-		messages = client.beta.threads.messages.list(thread_id=thread.id)
-		response_content = messages.data[0].content[0].text.value  # Récupération du texte de la réponse
+			# Récupérer la réponse finale de l'Assistant
+			messages = client.beta.threads.messages.list(thread_id=thread.id)
+			response_content = messages.data[0].content[0].text.value  # Récupération du texte de la réponse
+			try:
+				data = json.loads(response_content)
+				tag = data.get("tag", "")
+				title_without_tag = data.get("title", "")
+				content_without_title = data.get("summary", "")
+			except json.JSONDecodeError as e:
+				tag = "ERROR"
+				title_without_tag = "ERROR"
+				content_without_title = "ERROR"
+			
+			if title_without_tag != "ERROR":
+				return response_content
+			else
+				raise ValueError("GPT returned ERROR code")
+				attempt += 1
 
-		return response_content
-
-	except Exception as e:
-        	print(f"Erreur lors de l'appel à l'API : {e}")
-        	return None
+		except Exception as e:
+				print(f"Erreur lors de l'appel à l'API : {e}")
+				return None
+	return None
 
 def send_html_email(to_email, subject, html_body):
 	    """
@@ -281,7 +298,7 @@ def main():
 				articles_by_tag[tag] = []
 			articles_by_tag[tag].append(article_data)
 			
-
+		#EMAIL YCA
 		email_body = []
 		email_body.append("<h2>Récapitulatif des articles de la veille</h2><br>")
 
@@ -303,6 +320,29 @@ def main():
 		subject = f"Récapitulatif des articles du {docs_after_date.strftime('%Y-%m-%d')}"
 		send_html_email(
 			to_email=RECIPIENT_MAIL,
+			subject=subject,
+			html_body=email_body_str
+		)
+
+		email_body = []
+		email_body.append("<h2>Récapitulatif des articles Cyber de la veille</h2><br>")
+
+		for current_tag, articles_list in articles_by_tag.items():
+			if current_tag == 'Cybersecurite':
+				email_body.append(f"<br><br><h3>=== Thématique : {current_tag} ===</h3><br>")
+
+				for art in articles_list:
+					source_link = f'<a href="{art["url"]}">{art["source"]}</a>'
+					email_body.append(f"""
+						<h4>{art['title']}</h4>					
+						<p>{art['summary']}</p>
+						<p><strong> {art['published_date']} / {source_link}</strong></p>
+						<hr/>
+					""")
+		email_body_str = "\n".join(email_body)
+		subject = f"Récapitulatif des articles du {docs_after_date.strftime('%Y-%m-%d')}"
+		send_html_email(
+			to_email=RECIPIENT_MAIL_SECU,
 			subject=subject,
 			html_body=email_body_str
 		)
