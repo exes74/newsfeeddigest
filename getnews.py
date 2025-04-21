@@ -138,7 +138,7 @@ def push_to_notion(site_name, published_date, tag, title_without_tag, content_wi
 
 
 def convert_html_to_text(html_content):
-		"""
+	"""
 	Converts HTML content into plain text by removing tags.
 	"""
 	soup = BeautifulSoup(html_content, 'html.parser')
@@ -147,7 +147,7 @@ def convert_html_to_text(html_content):
 	return cleaned_text
 
 def fetch_reader_document_list_api(updated_after=None):
-		"""
+	"""
 	Fetch articles from Readwise API with optional filtering by date.
 	"""
 	full_data = []
@@ -175,7 +175,7 @@ def fetch_reader_document_list_api(updated_after=None):
 
 def summarize_gpt(article_content, retries=5, delay=2):
 	attempt = 0
-		"""
+	"""
 	Summarizes an article using OpenAI's GPT model.
 	"""
 	while attempt < retries:
@@ -227,7 +227,7 @@ def summarize_gpt(article_content, retries=5, delay=2):
 	return None
 
 def send_html_email(to_email, subject, html_body):
-		"""
+	"""
 	Sends an HTML email with the specified subject and body.
 	"""
 	from_email = SENDER_MAIL
@@ -251,7 +251,7 @@ def send_html_email(to_email, subject, html_body):
 
 
 def main():
-		"""
+	"""
 	Main function to fetch, process, summarize, store, and email articles.
 	"""
 	yesterday_str = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
