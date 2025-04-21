@@ -25,16 +25,16 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 CONFIG_PATH = "/etc/scrt/api_key"
 
 def load_api_keys(config_path):
-    try:
-        with open(config_path, "r") as file:
-            data = json.load(file)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur : Le fichier {config_path} n'existe pas.")
-        return None
-    except json.JSONDecodeError:
-        print("Erreur : Le fichier JSON est mal formaté.")
-        return None
+	try:
+		with open(config_path, "r") as file:
+			data = json.load(file)
+		return data
+	except FileNotFoundError:
+		print(f"Erreur : Le fichier {config_path} n'existe pas.")
+		return None
+	except json.JSONDecodeError:
+		print("Erreur : Le fichier JSON est mal formaté.")
+		return None
 # Charger les clés
 api_keys = load_api_keys(CONFIG_PATH)
 # Vérifier et assigner les variables si le fichier a été bien chargé
@@ -54,32 +54,32 @@ notion = Client(auth=NOTION_TOKEN)
 ASSISTANT_ID = "asst_8XTJeyIuPctQM5AKm8VrBGb8"
 
 def load_api_keys(config_path):
-    """
-    Load API keys from a JSON configuration file.
-    """
-    try:
-        with open(config_path, "r") as file:
-            data = json.load(file)
-        return data
-    except FileNotFoundError:
-        print(f"Erreur : Le fichier {config_path} n'existe pas.")
-        return None
-    except json.JSONDecodeError:
-        print("Erreur : Le fichier JSON est mal formaté.")
-        return None
+	"""
+	Load API keys from a JSON configuration file.
+	"""
+	try:
+		with open(config_path, "r") as file:
+			data = json.load(file)
+		return data
+	except FileNotFoundError:
+		print(f"Erreur : Le fichier {config_path} n'existe pas.")
+		return None
+	except json.JSONDecodeError:
+		print("Erreur : Le fichier JSON est mal formaté.")
+		return None
 
 
 
 def push_to_notion(site_name, published_date, tag, title_without_tag, content_without_title, url):
-	    """
-    Stores an article in the specified Notion database.
-    """
+	"""
+	Stores an article in the specified Notion database.
+	"""
 	database_info = notion.databases.retrieve(database_id=NOTION_DATABASE_ID)
 	print(database_info)
 	
 	"""
 	Enregistre un article dans la base Notion spécifiée par NOTION_DATABASE_ID.
-	"""  
+	"""	 
 	new_page_properties = {
 		# Titre : 
 		"Title": {
@@ -138,18 +138,18 @@ def push_to_notion(site_name, published_date, tag, title_without_tag, content_wi
 
 
 def convert_html_to_text(html_content):
-	    """
-    Converts HTML content into plain text by removing tags.
-    """
+		"""
+	Converts HTML content into plain text by removing tags.
+	"""
 	soup = BeautifulSoup(html_content, 'html.parser')
 	text = soup.get_text()
 	cleaned_text = ' '.join(text.split())
 	return cleaned_text
 
 def fetch_reader_document_list_api(updated_after=None):
-	    """
-    Fetch articles from Readwise API with optional filtering by date.
-    """
+		"""
+	Fetch articles from Readwise API with optional filtering by date.
+	"""
 	full_data = []
 	next_page_cursor = None
 	while True:
@@ -175,9 +175,9 @@ def fetch_reader_document_list_api(updated_after=None):
 
 def summarize_gpt(article_content, retries=5, delay=2):
 	attempt = 0
-	    """
-    Summarizes an article using OpenAI's GPT model.
-    """
+		"""
+	Summarizes an article using OpenAI's GPT model.
+	"""
 	while attempt < retries:
 		try:
 			client = openai.OpenAI(api_key=OPENAI_API_KEY)
@@ -227,11 +227,11 @@ def summarize_gpt(article_content, retries=5, delay=2):
 	return None
 
 def send_html_email(to_email, subject, html_body):
-	    """
-    Sends an HTML email with the specified subject and body.
-    """
+		"""
+	Sends an HTML email with the specified subject and body.
+	"""
 	from_email = SENDER_MAIL
-	password = PWD_MAIL  #
+	password = PWD_MAIL	 #
 
 	msg = MIMEMultipart("alternative")
 	msg["Subject"] = subject
@@ -251,9 +251,9 @@ def send_html_email(to_email, subject, html_body):
 
 
 def main():
-	    """
-    Main function to fetch, process, summarize, store, and email articles.
-    """
+		"""
+	Main function to fetch, process, summarize, store, and email articles.
+	"""
 	yesterday_str = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 	docs_after_date = datetime.datetime.now() - datetime.timedelta(hours=48)	
 	articles = fetch_reader_document_list_api(docs_after_date.isoformat())	
