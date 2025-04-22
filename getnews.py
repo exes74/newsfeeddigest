@@ -219,7 +219,7 @@ def summarize_gpt(article_content, retries=5, delay=2):
 			if title_without_tag != "ERROR":
 				return response_content
 			else:
-				raise ValueError("GPT returned ERROR code")
+				#raise ValueError("GPT returned ERROR code")
 				attempt += 1
 				print (str(attempt))
 
