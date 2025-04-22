@@ -273,7 +273,7 @@ def summarize_gpt(article_content, retries=5, delay=2):
 			# Essai de parsing
 			try:
 				data = json.loads(response_content)
-				return data
+				return response_content
 			except json.JSONDecodeError as e:
 				print(f"Erreur de parsing JSON : {e}")
 				attempt += 1
