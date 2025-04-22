@@ -174,58 +174,132 @@ def fetch_reader_document_list_api(updated_after=None):
 	# return full_data
 	return full_data[:20]
 
+# def summarize_gpt(article_content, retries=5, delay=2):
+	# attempt = 0
+	# """
+	# Summarizes an article using OpenAI's GPT model.
+	# """
+	# while attempt < retries:
+		# try:
+			# client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
+			# Création d'un thread pour interagir avec l'assistant
+			# thread = client.beta.threads.create()
+
+			# Envoi de l'article à l'Assistant
+			# message = client.beta.threads.messages.create(
+				# thread_id=thread.id,
+				# role="user",
+				# content=article_content
+				# )
+
+			# Lancer l'Assistant sur le thread
+			# run = client.beta.threads.runs.create(
+						# thread_id=thread.id,
+						# assistant_id=ASSISTANT_ID
+				# )
+
+			# Attendre que l'Assistant ait fini de traiter la requête
+			# while run.status not in ["completed", "failed"]:
+				# run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+
+			# Récupérer la réponse finale de l'Assistant
+			# messages = client.beta.threads.messages.list(thread_id=thread.id)
+			# response_content = messages.data[0].content[0].text.value  # Récupération du texte de la réponse
+			# try:
+				# data = json.loads(response_content)
+				# tag = data.get("tag", "")
+				# title_without_tag = data.get("title", "")
+				# content_without_title = data.get("summary", "")
+			# except json.JSONDecodeError as e:
+				# tag = "ERROR"
+				# title_without_tag = "ERROR"
+				# content_without_title = "ERROR"
+			
+			# if title_without_tag != "ERROR":
+				# return response_content
+			# else:
+				# raise ValueError("GPT returned ERROR code")
+				# attempt += 1
+				# print (str(attempt))
+
+		# except Exception as e:
+				# print(f"Erreur lors de l'appel à l'API : {e}")
+				# return None
+	# return None
+import openai
+import json
+import time
+
 def summarize_gpt(article_content, retries=5, delay=2):
 	attempt = 0
-	"""
-	Summarizes an article using OpenAI's GPT model.
-	"""
+
+	client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
 	while attempt < retries:
 		try:
-			client = openai.OpenAI(api_key=OPENAI_API_KEY)
-
 			# Création d'un thread pour interagir avec l'assistant
 			thread = client.beta.threads.create()
 
 			# Envoi de l'article à l'Assistant
-			message = client.beta.threads.messages.create(
+			client.beta.threads.messages.create(
 				thread_id=thread.id,
 				role="user",
 				content=article_content
-				)
+			)
 
-			# Lancer l'Assistant sur le thread
+			# Lancement de l'Assistant sur le thread
 			run = client.beta.threads.runs.create(
-						thread_id=thread.id,
-						assistant_id=ASSISTANT_ID
+				thread_id=thread.id,
+				assistant_id=ASSISTANT_ID
+			)
+
+			# Attente active (polling) avec délai
+			while True:
+				run = client.beta.threads.runs.retrieve(
+					thread_id=thread.id, 
+					run_id=run.id
 				)
 
-			# Attendre que l'Assistant ait fini de traiter la requête
-			while run.status not in ["completed", "failed"]:
-				run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+				if run.status == "completed":
+					break
+				elif run.status == "failed":
+					print(f"Erreur : Run failed. Details : {run.last_error}")
+					raise Exception(run.last_error)
+
+				# Attente de 1 seconde avant la prochaine vérification
+				time.sleep(1)
 
 			# Récupérer la réponse finale de l'Assistant
 			messages = client.beta.threads.messages.list(thread_id=thread.id)
-			response_content = messages.data[0].content[0].text.value  # Récupération du texte de la réponse
+			response_content = messages.data[0].content[0].text.value
+
+			# Parsing de la réponse attendue
 			try:
 				data = json.loads(response_content)
 				tag = data.get("tag", "")
 				title_without_tag = data.get("title", "")
 				content_without_title = data.get("summary", "")
 			except json.JSONDecodeError as e:
-				tag = "ERROR"
-				title_without_tag = "ERROR"
-				content_without_title = "ERROR"
-			
+				print(f"Erreur de parsing JSON : {e}")
+				tag = title_without_tag = content_without_title = "ERROR"
+
 			if title_without_tag != "ERROR":
 				return response_content
 			else:
-				#raise ValueError("GPT returned ERROR code")
+				print("GPT returned ERROR code in content.")
 				attempt += 1
-				print (str(attempt))
+				time.sleep(delay)  # pause avant nouvel essai
+				print(f"Tentative {attempt}/{retries}")
 
 		except Exception as e:
-				print(f"Erreur lors de l'appel à l'API : {e}")
-				return None
+			print(f"Erreur lors de l'appel à l'API : {e}")
+			attempt += 1
+			time.sleep(delay)  # pause avant nouvel essai
+			print(f"Tentative {attempt}/{retries}")
+
+	# Échec après toutes les tentatives
+	print("Échec après toutes les tentatives.")
 	return None
 
 def send_html_email(to_email, subject, html_body):
