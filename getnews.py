@@ -264,7 +264,7 @@ def summarize_gpt(article_content, retries=5, delay=2):
 
 			messages = client.beta.threads.messages.list(thread_id=thread.id)
 			response_content = messages.data[0].content[0].text.value
-
+			response_content = clean_json(response_content)
 			# Affichage du contenu brut pour identifier l'erreur
 			print("\n--- Réponse brute renvoyée par GPT ---\n")
 			print(response_content)
@@ -288,6 +288,10 @@ def summarize_gpt(article_content, retries=5, delay=2):
 
 	print("Échec après toutes les tentatives.")
 	return None
+
+def clean_json(json_str):
+	# Supprime toute virgule en trop à la fin d'objets JSON
+	return re.sub(r',\s*(}|])', r'\1', json_str)
 
 def send_html_email(to_email, subject, html_body):
 	"""
