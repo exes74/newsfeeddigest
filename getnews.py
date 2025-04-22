@@ -221,6 +221,7 @@ def summarize_gpt(article_content, retries=5, delay=2):
 			else:
 				raise ValueError("GPT returned ERROR code")
 				attempt += 1
+				print (str(attempt))
 
 		except Exception as e:
 				print(f"Erreur lors de l'appel à l'API : {e}")
