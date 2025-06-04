@@ -45,7 +45,8 @@ if api_keys:
 	NOTION_TOKEN = api_keys.get("NOTION_TOKEN")
 	SENDER_MAIL = api_keys.get("SENDER_MAIL")
 	RECIPIENT_MAIL = api_keys.get("RECIPIENT_MAIL")
-	RECIPIENT_MAIL_SECU = api_keys.get("RECIPIENT_MAIL_SECU")
+	RECIPIENT_MAIL_SECU_RAW = api_keys.get("RECIPIENT_MAIL_SECU","")
+	RECIPIENT_MAIL_SECU = [email.strip() for email in  RECIPIENT_MAIL_SECU_RAW.strip("'").replace(',', ';').split(';') if email.strip()]
 	PWD_MAIL = api_keys.get("PWD_MAIL")
 	# Affichage de test (retirer en prod)
 	print("Clés chargées avec succès !")
@@ -293,7 +294,7 @@ def clean_json(json_str):
 	# Supprime toute virgule en trop à la fin d'objets JSON
 	return re.sub(r',\s*(}|])', r'\1', json_str)
 
-def send_html_email(to_email, subject, html_body):
+def send_html_email(to_email, subject, html_body,secu):
 	"""
 	Sends an HTML email with the specified subject and body.
 	"""
@@ -303,8 +304,10 @@ def send_html_email(to_email, subject, html_body):
 	msg = MIMEMultipart("alternative")
 	msg["Subject"] = subject
 	msg["From"] = from_email
-	msg["To"] = to_email
-
+	if secu == 1 :
+		msg["To"]  = ", ".join(to_email) 
+	else :
+		msg["To"] = to_email
 	text_body = "Votre client mail ne supporte pas l'affichage HTML."
 	part_text = MIMEText(text_body, "plain", "utf-8")
 	msg.attach(part_text)
@@ -388,7 +391,8 @@ def main():
 		send_html_email(
 			to_email=RECIPIENT_MAIL,
 			subject=subject,
-			html_body=email_body_str
+			html_body=email_body_str,
+			secu = 0
 		)
 
 		email_body = []
@@ -411,7 +415,8 @@ def main():
 		send_html_email(
 			to_email=RECIPIENT_MAIL_SECU,
 			subject=subject,
-			html_body=email_body_str
+			html_body=email_body_str,
+			secu = 1
 		)
 	else:
 		email_body_str = "Aucun article trouvé pour les dernières 24h."
@@ -419,7 +424,8 @@ def main():
 		send_html_email(
 			to_email=RECIPIENT_MAIL,
 			subject=subject,
-			html_body=email_body_str
+			html_body=email_body_str,
+			secu = 0
 		)
 		print("Aucun article trouvé pour les dernières 24h.")
 
